@@ -10,25 +10,25 @@ export const Team: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const data = await userService.getAllUsers();
-        setUsers(data);
-      } catch (error) {
-        console.error('Failed to fetch users:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUsers();
-  }, []);
+  const fetchUsers = async () => {
+    try {
+      const data = await userService.getAllUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddSuccess = () => {
     setShowAddModal(false);
     fetchUsers(); // Refresh the users list
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const getRoleColor = (role: string) => {
     switch (role) {

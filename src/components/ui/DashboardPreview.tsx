@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { dummyProjects, dummyTasks, dummyUsers } from '@/data/dummyData';
 
 export const DashboardPreview: React.FC = () => {

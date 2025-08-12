@@ -14,7 +14,6 @@ import {
   ProjectStatus,
   UserRole,
   NotificationType,
-  ActivityType,
   PaginatedResponse,
 } from '@/types';
 
@@ -458,7 +457,13 @@ export class MockApiService {
 
   async getNotificationCounts() {
     await mockDelay();
-    if (!currentUser) return { total: 0, unread: 0, byType: {} };
+    
+    const emptyByType = {} as Record<NotificationType, number>;
+    Object.values(NotificationType).forEach(type => {
+      emptyByType[type] = 0;
+    });
+    
+    if (!currentUser) return { total: 0, unread: 0, byType: emptyByType };
     
     const userNotifications = dummyNotifications.filter(n => n.userId === currentUser!.id);
     const unread = userNotifications.filter(n => !n.isRead);

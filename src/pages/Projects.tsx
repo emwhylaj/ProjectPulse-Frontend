@@ -10,23 +10,23 @@ export const Projects: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
 
+  const fetchProjects = async () => {
+    try {
+      const data = await projectService.getAllProjects();
+      setProjects(data);
+    } catch (error) {
+      console.error('Failed to fetch projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddSuccess = () => {
+    setShowAddModal(false);
+    fetchProjects(); // Refresh the projects list
+  };
+
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const data = await projectService.getAllProjects();
-        setProjects(data);
-      } catch (error) {
-        console.error('Failed to fetch projects:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    const handleAddSuccess = () => {
-      setShowAddModal(false);
-      fetchProjects(); // Refresh the projects list
-    };
-
     fetchProjects();
   }, []);
 

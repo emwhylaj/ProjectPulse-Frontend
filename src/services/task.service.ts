@@ -1,4 +1,5 @@
 import { apiClient } from './api';
+import { mockApiService } from './mockApi.service';
 import {
   Task,
   TaskComment,
@@ -7,12 +8,17 @@ import {
   TaskStatus,
 } from '@/types';
 
+// Use mock API for development/demo purposes
+const USE_MOCK_API = true;
+
 export class TaskService {
   private readonly BASE_URL = '/api/tasks';
 
   // Task CRUD operations
   async getAllTasks(): Promise<Task[]> {
-    return await apiClient.get<Task[]>(this.BASE_URL);
+    return USE_MOCK_API
+      ? await mockApiService.getAllTasks()
+      : await apiClient.get<Task[]>(this.BASE_URL);
   }
 
   async getTaskById(id: number): Promise<Task> {
@@ -30,6 +36,9 @@ export class TaskService {
   }
 
   async getMyTasks(status?: TaskStatus): Promise<Task[]> {
+    if (USE_MOCK_API) {
+      return await mockApiService.getMyTasks(status);
+    }
     const params: any = {};
     if (status) params.status = status;
     return await apiClient.get<Task[]>(`${this.BASE_URL}/my-tasks`, params);
@@ -40,7 +49,9 @@ export class TaskService {
   }
 
   async getOverdueTasks(): Promise<Task[]> {
-    return await apiClient.get<Task[]>(`${this.BASE_URL}/overdue`);
+    return USE_MOCK_API
+      ? await mockApiService.getOverdueTasks()
+      : await apiClient.get<Task[]>(`${this.BASE_URL}/overdue`);
   }
 
   async getTasksByStatus(status: TaskStatus): Promise<Task[]> {
@@ -58,7 +69,9 @@ export class TaskService {
   }
 
   async getTasksDueSoon(days: number = 3): Promise<Task[]> {
-    return await apiClient.get<Task[]>(`${this.BASE_URL}/due-soon`, { days });
+    return USE_MOCK_API
+      ? await mockApiService.getTasksDueSoon(days)
+      : await apiClient.get<Task[]>(`${this.BASE_URL}/due-soon`, { days });
   }
 
   async searchTasks(

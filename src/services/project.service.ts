@@ -1,4 +1,5 @@
 import { apiClient } from './api';
+import { mockApiService } from './mockApi.service';
 import {
   Project,
   ProjectMember,
@@ -8,20 +9,29 @@ import {
   ProjectMemberRole,
 } from '@/types';
 
+// Use mock API for development/demo purposes
+const USE_MOCK_API = true;
+
 export class ProjectService {
   private readonly BASE_URL = '/api/projects';
 
   // Project CRUD operations
   async getAllProjects(): Promise<Project[]> {
-    return await apiClient.get<Project[]>(this.BASE_URL);
+    return USE_MOCK_API 
+      ? await mockApiService.getAllProjects()
+      : await apiClient.get<Project[]>(this.BASE_URL);
   }
 
   async getProjectById(id: number): Promise<Project> {
-    return await apiClient.get<Project>(`${this.BASE_URL}/${id}`);
+    return USE_MOCK_API
+      ? await mockApiService.getProjectById(id)
+      : await apiClient.get<Project>(`${this.BASE_URL}/${id}`);
   }
 
   async getProjectWithDetails(id: number): Promise<Project> {
-    return await apiClient.get<Project>(`${this.BASE_URL}/${id}/details`);
+    return USE_MOCK_API
+      ? await mockApiService.getProjectWithDetails(id)
+      : await apiClient.get<Project>(`${this.BASE_URL}/${id}/details`);
   }
 
   async getUserProjects(userId: number): Promise<Project[]> {
@@ -29,7 +39,9 @@ export class ProjectService {
   }
 
   async getMyProjects(): Promise<Project[]> {
-    return await apiClient.get<Project[]>(`${this.BASE_URL}/my-projects`);
+    return USE_MOCK_API
+      ? await mockApiService.getMyProjects()
+      : await apiClient.get<Project[]>(`${this.BASE_URL}/my-projects`);
   }
 
   async getProjectsByStatus(status: ProjectStatus): Promise<Project[]> {
@@ -55,7 +67,9 @@ export class ProjectService {
   }
 
   async createProject(data: CreateProjectRequest): Promise<Project> {
-    return await apiClient.post<Project>(this.BASE_URL, data);
+    return USE_MOCK_API
+      ? await mockApiService.createProject(data)
+      : await apiClient.post<Project>(this.BASE_URL, data);
   }
 
   async updateProject(id: number, data: UpdateProjectRequest): Promise<Project> {

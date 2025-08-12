@@ -1,12 +1,18 @@
 import { apiClient } from './api';
+import { mockApiService } from './mockApi.service';
 import { AuthResult, LoginRequest, RegisterRequest, User } from '@/types';
 import Cookies from 'js-cookie';
+
+// Use mock API for development/demo purposes
+const USE_MOCK_API = true;
 
 export class AuthService {
   private readonly BASE_URL = '/api/auth';
 
   async login(credentials: LoginRequest): Promise<AuthResult> {
-    const result = await apiClient.post<AuthResult>(`${this.BASE_URL}/login`, credentials);
+    const result = USE_MOCK_API 
+      ? await mockApiService.login(credentials.email, credentials.password)
+      : await apiClient.post<AuthResult>(`${this.BASE_URL}/login`, credentials);
     
     if (result.success && result.token && result.user) {
       apiClient.setAuthToken(result.token);
@@ -17,7 +23,9 @@ export class AuthService {
   }
 
   async register(data: RegisterRequest): Promise<AuthResult> {
-    const result = await apiClient.post<AuthResult>(`${this.BASE_URL}/register`, data);
+    const result = USE_MOCK_API
+      ? await mockApiService.register(data)
+      : await apiClient.post<AuthResult>(`${this.BASE_URL}/register`, data);
     
     if (result.success && result.token && result.user) {
       apiClient.setAuthToken(result.token);
@@ -29,7 +37,13 @@ export class AuthService {
 
   async logout(): Promise<void> {
     try {
-      await apiClient.post(`${this.BASE_URL}/logout`);
+      // In mock mode, we don't need to call the API
+      if (USE_MOCK_API) {
+        // Just simulate a small delay for UX
+        await new Promise(resolve => setTimeout(resolve, 200));
+      } else {
+        await apiClient.post(`${this.BASE_URL}/logout`);
+      }
     } catch (error) {
       // Continue with logout even if API call fails
       console.warn('Logout API call failed:', error);
@@ -40,6 +54,11 @@ export class AuthService {
   }
 
   async getCurrentUser(): Promise<User> {
+    if (USE_MOCK_API) {
+      const user = await mockApiService.getCurrentUser();
+      if (!user) throw new Error('User not found');
+      return user;
+    }
     return await apiClient.get<User>(`${this.BASE_URL}/me`);
   }
 

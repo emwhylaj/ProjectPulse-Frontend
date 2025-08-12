@@ -1,12 +1,18 @@
 import { apiClient } from './api';
+import { mockApiService } from './mockApi.service';
 import { User, UserRole, PaginatedResponse } from '@/types';
+
+// Use mock API for development/demo purposes
+const USE_MOCK_API = true;
 
 export class UserService {
   private readonly BASE_URL = '/api/users';
 
   // User CRUD operations
   async getAllUsers(): Promise<User[]> {
-    return await apiClient.get<User[]>(this.BASE_URL);
+    return USE_MOCK_API
+      ? await mockApiService.getAllUsers()
+      : await apiClient.get<User[]>(this.BASE_URL);
   }
 
   async getUserById(id: number): Promise<User> {
@@ -136,6 +142,9 @@ export class UserService {
     overdueTasks: number;
     taskCompletionRate: number;
   }> {
+    if (USE_MOCK_API) {
+      return await mockApiService.getMyStats();
+    }
     return await apiClient.get<{
       totalProjects: number;
       activeProjects: number;

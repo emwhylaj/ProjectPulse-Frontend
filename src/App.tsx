@@ -4,7 +4,7 @@ import { Toaster } from 'react-hot-toast';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Pages
-import { LandingPage, Dashboard } from '@/pages';
+import { LandingPage, Dashboard, DemoShowcase, Projects, Tasks, Team } from '@/pages';
 
 // Auth Components
 import { LoginForm, RegisterForm } from '@/components/auth';
@@ -14,6 +14,9 @@ import { ProtectedRoute, AuthGuard } from '@/components/layout';
 
 // Stores
 import { useAuthStore } from '@/stores';
+
+// Mock Data
+import { initializeMockData } from '@/utils/initMockData';
 
 // Create React Query client
 const queryClient = new QueryClient({
@@ -29,6 +32,9 @@ function App() {
   const { checkAuthState, isAuthenticated } = useAuthStore();
 
   useEffect(() => {
+    // Initialize mock data for demo purposes
+    initializeMockData();
+    
     // Check authentication state on app load
     checkAuthState();
   }, [checkAuthState]);
@@ -73,7 +79,7 @@ function App() {
                 <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
                   <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">Forgot Password</h2>
-                    <p className="text-gray-600 mb-4">This feature is coming soon!</p>
+                    <p className="text-gray-600 mb-4">For password reset, please contact support at admin@projectpulse.com</p>
                     <button 
                       onClick={() => window.history.back()} 
                       className="text-blue-600 hover:text-blue-500"
@@ -127,6 +133,42 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/demo" 
+              element={
+                <ProtectedRoute>
+                  <DemoShowcase />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/projects" 
+              element={
+                <ProtectedRoute>
+                  <Projects />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/tasks" 
+              element={
+                <ProtectedRoute>
+                  <Tasks />
+                </ProtectedRoute>
+              } 
+            />
+            
+            <Route 
+              path="/team" 
+              element={
+                <ProtectedRoute>
+                  <Team />
                 </ProtectedRoute>
               } 
             />

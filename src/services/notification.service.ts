@@ -1,5 +1,9 @@
 import { apiClient } from './api';
+import { mockApiService } from './mockApi.service';
 import { Notification, NotificationType, PaginatedResponse } from '@/types';
+
+// Use mock API for development/demo purposes
+const USE_MOCK_API = true;
 
 export class NotificationService {
   private readonly BASE_URL = '/api/notifications';
@@ -29,13 +33,18 @@ export class NotificationService {
     pageSize: number = 20,
     unreadOnly: boolean = false
   ): Promise<PaginatedResponse<Notification>> {
+    if (USE_MOCK_API) {
+      return await mockApiService.getMyNotifications(page, pageSize, unreadOnly);
+    }
     const params: any = { page, pageSize };
     if (unreadOnly) params.unreadOnly = true;
     return await apiClient.get<PaginatedResponse<Notification>>(`${this.BASE_URL}/my-notifications`, params);
   }
 
   async getUnreadNotifications(): Promise<Notification[]> {
-    return await apiClient.get<Notification[]>(`${this.BASE_URL}/unread`);
+    return USE_MOCK_API
+      ? await mockApiService.getUnreadNotifications()
+      : await apiClient.get<Notification[]>(`${this.BASE_URL}/unread`);
   }
 
   async getNotificationsByType(type: NotificationType): Promise<Notification[]> {
@@ -51,6 +60,9 @@ export class NotificationService {
     unread: number;
     byType: Record<NotificationType, number>;
   }> {
+    if (USE_MOCK_API) {
+      return await mockApiService.getNotificationCounts();
+    }
     return await apiClient.get<{
       total: number;
       unread: number;

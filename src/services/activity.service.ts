@@ -1,5 +1,9 @@
 import { apiClient } from './api';
+import { mockApiService } from './mockApi.service';
 import { ProjectActivity, ActivityType, PaginatedResponse } from '@/types';
+
+// Use mock API for development/demo purposes
+const USE_MOCK_API = true;
 
 export class ActivityService {
   private readonly BASE_URL = '/api/activities';
@@ -22,6 +26,9 @@ export class ActivityService {
     pageSize: number = 20,
     activityType?: ActivityType
   ): Promise<PaginatedResponse<ProjectActivity>> {
+    if (USE_MOCK_API) {
+      return await mockApiService.getProjectActivities(projectId, page, pageSize);
+    }
     const params: any = { page, pageSize };
     if (activityType) params.activityType = activityType;
     return await apiClient.get<PaginatedResponse<ProjectActivity>>(
@@ -70,6 +77,9 @@ export class ActivityService {
     projectId?: number,
     userId?: number
   ): Promise<ProjectActivity[]> {
+    if (USE_MOCK_API) {
+      return await mockApiService.getRecentActivities(limit, projectId, userId);
+    }
     const params: any = { limit };
     if (projectId) params.projectId = projectId;
     if (userId) params.userId = userId;

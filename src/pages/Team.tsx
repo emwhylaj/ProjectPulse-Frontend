@@ -9,6 +9,9 @@ export const Team: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -23,6 +26,22 @@ export const Team: React.FC = () => {
 
   const handleAddSuccess = () => {
     setShowAddModal(false);
+    fetchUsers(); // Refresh the users list
+  };
+
+  const handleViewProfile = (user: User) => {
+    setSelectedUser(user);
+    setShowProfileModal(true);
+  };
+
+  const handleEditUser = (user: User) => {
+    setSelectedUser(user);
+    setShowEditModal(true);
+  };
+
+  const handleEditSuccess = () => {
+    setShowEditModal(false);
+    setSelectedUser(null);
     fetchUsers(); // Refresh the users list
   };
 
@@ -197,10 +216,16 @@ export const Team: React.FC = () => {
                   </div>
                   
                   <div className="mt-4 flex justify-center space-x-2">
-                    <button className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200">
+                    <button 
+                      onClick={() => handleViewProfile(user)}
+                      className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded hover:bg-blue-200 transition-colors"
+                    >
                       View Profile
                     </button>
-                    <button className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200">
+                    <button 
+                      onClick={() => handleEditUser(user)}
+                      className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+                    >
                       Edit
                     </button>
                   </div>
@@ -221,6 +246,196 @@ export const Team: React.FC = () => {
             onSuccess={handleAddSuccess}
             onCancel={() => setShowAddModal(false)}
           />
+        </Modal>
+
+        {/* View Profile Modal */}
+        <Modal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+          title="User Profile"
+          maxWidth="md"
+        >
+          {selectedUser && (
+            <div className="space-y-6">
+              <div className="text-center">
+                {selectedUser.profileImageUrl ? (
+                  <img
+                    className="h-24 w-24 rounded-full mx-auto mb-4"
+                    src={selectedUser.profileImageUrl}
+                    alt={`${selectedUser.firstName} ${selectedUser.lastName}`}
+                  />
+                ) : (
+                  <div className="h-24 w-24 rounded-full bg-blue-500 flex items-center justify-center mx-auto mb-4">
+                    <span className="text-2xl font-medium text-white">
+                      {selectedUser.firstName[0]}{selectedUser.lastName[0]}
+                    </span>
+                  </div>
+                )}
+                <h3 className="text-xl font-semibold text-gray-900">
+                  {selectedUser.firstName} {selectedUser.lastName}
+                </h3>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mt-2 ${getRoleColor(selectedUser.role)}`}>
+                  {getRoleName(selectedUser.role)}
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-4">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-gray-900 mb-3">Contact Information</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Email:</span>
+                      <span className="text-gray-900">{selectedUser.email}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Phone:</span>
+                      <span className="text-gray-900">{selectedUser.phoneNumber}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Status:</span>
+                      <span className={`inline-flex items-center ${selectedUser.isActive ? 'text-green-600' : 'text-red-600'}`}>
+                        <div className={`w-2 h-2 rounded-full mr-1 ${selectedUser.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                        {selectedUser.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <h4 className="font-medium text-gray-900 mb-3">Account Details</h4>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">User ID:</span>
+                      <span className="text-gray-900">#{selectedUser.id}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Joined:</span>
+                      <span className="text-gray-900">{new Date(selectedUser.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Last Login:</span>
+                      <span className="text-gray-900">{new Date(selectedUser.lastLoginAt).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
+                <button
+                  onClick={() => setShowProfileModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                >
+                  Close
+                </button>
+                <button
+                  onClick={() => {
+                    setShowProfileModal(false);
+                    handleEditUser(selectedUser);
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Edit User
+                </button>
+              </div>
+            </div>
+          )}
+        </Modal>
+
+        {/* Edit User Modal */}
+        <Modal
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          title="Edit User"
+          maxWidth="lg"
+        >
+          {selectedUser && (
+            <div className="space-y-4">
+              <p className="text-sm text-gray-600 mb-4">
+                Edit user information for {selectedUser.firstName} {selectedUser.lastName}
+              </p>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> This is a demo application. User editing functionality would typically connect to a backend API to save changes.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <input
+                    type="text"
+                    defaultValue={selectedUser.firstName}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <input
+                    type="text"
+                    defaultValue={selectedUser.lastName}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <input
+                    type="email"
+                    defaultValue={selectedUser.email}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                  <input
+                    type="tel"
+                    defaultValue={selectedUser.phoneNumber}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                  <select
+                    defaultValue={selectedUser.role}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Admin">Admin</option>
+                    <option value="ProjectManager">Project Manager</option>
+                    <option value="TeamMember">Team Member</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                  <select
+                    defaultValue={selectedUser.isActive ? 'active' : 'inactive'}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-6">
+                <button
+                  onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    // In a real app, this would save to the backend
+                    alert('Changes saved successfully! (Demo mode)');
+                    handleEditSuccess();
+                  }}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  Save Changes
+                </button>
+              </div>
+            </div>
+          )}
         </Modal>
 
         <UserSwitcher />

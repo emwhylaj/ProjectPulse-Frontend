@@ -64,22 +64,22 @@ export const LandingPage: React.FC = () => {
 
   const testimonials = [
     {
-      name: 'Sarah Johnson',
+      name: 'Adunni Olamide',
       role: 'Project Manager at TechCorp',
       content: 'ProjectPulse has transformed how we manage our projects. The intuitive interface and powerful features have increased our team productivity by 40%.',
-      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face',
+      initials: 'AO',
     },
     {
-      name: 'Michael Chen',
+      name: 'Kelechi Okwu',
       role: 'CEO at StartupHub',
       content: 'The real-time collaboration features are game-changing. Our remote team stays connected and productive like never before.',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      initials: 'KO',
     },
     {
-      name: 'Emily Davis',
+      name: 'Funmilayo Adebayo',
       role: 'Team Lead at DesignStudio',
       content: 'ProjectPulse makes it easy to track progress and meet deadlines. The reporting features provide valuable insights into our workflow.',
-      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+      initials: 'FA',
     },
   ];
 
@@ -217,11 +217,9 @@ export const LandingPage: React.FC = () => {
               >
                 <p className="text-gray-600 mb-6 italic">"{testimonial.content}"</p>
                 <div className="flex items-center">
-                  <img
-                    src={testimonial.avatar}
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full mr-4"
-                  />
+                  <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-semibold mr-4">
+                    {testimonial.initials}
+                  </div>
                   <div>
                     <h4 className="font-semibold text-gray-900">{testimonial.name}</h4>
                     <p className="text-sm text-gray-600">{testimonial.role}</p>
